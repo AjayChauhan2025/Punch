@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="gu">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Attendance App — Admin + Employee (Gujarati)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gujarati:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #ffffff; /* background હવે white */
+            --card: #f9fafb; /* card હવે very light gray */
+            --muted: #6b7280;
+            --txt: #111827; /* text હવે dark */
+            --accent: #10b981;
+            --accent2: #3b82f6;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Noto Sans Gujarati',system-ui,-apple-system,Segoe UI,Roboto,Arial;
+            margin: 0;
+            background: var(--bg);
+            color: var(--txt);
+            padding: 14px;
+        }
+
+        .wrap {
+            max-width: 980px;
+            margin: 0 auto
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid #e5e7eb;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 20px
+        }
+
+        label {
+            font-size: 13px;
+            color: var(--muted);
+            display: block;
+            margin-bottom: 6px
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            color: var(--txt);
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+
+        .col {
+            flex: 1
+        }
+
+        .btn {
+            border: 0;
+            padding: 10px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600
+        }
+
+            .btn.primary {
+                background: var(--accent);
+                color: white
+            }
+
+            .btn.secondary {
+                background: var(--accent2);
+                color: white
+            }
+
+            .btn.ghost {
+                background: transparent;
+                border: 1px solid #d1d5db;
+                color: var(--txt)
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px
+        }
+
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        .small {
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .badge {
+            padding: 6px 8px;
+            border-radius: 999px;
+            background: #f3f4f6;
+            font-size: 12px;
+        }
+
+        .grid2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px
+        }
+
+        .danger {
+            color: var(--danger)
+        }
+
+        .center {
+            text-align: center
+        }
+
+        footer {
+            font-size: 12px;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 8px
+        }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap
+        }
+    </style>
+
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>📋 Attendance System (Admin + Employee)</h1>
+      <p class="small">ફિંગરપ્રિન્ટ (WebAuthn) પરથી punch કરવા માટે Register/Authenticate કરવાની સજ્જતા. Data LocalStorage માં રહેશે — જરૂર હોય તો પછી Firebase જોડશે.</p>
+    </div>
+
+    <!-- AUTH / ADMIN PIN -->
+    <div class="card" id="authCard">
+      <div class="row">
+        <div class="col">
+          <label>એડમિન PIN</label>
+          <input id="adminPin" type="password" placeholder="એડમિન PIN દાખલ કરો" />
+        </div>
+        <div style="width:180px">
+          <label>&nbsp;</label>
+          <div class="row">
+            <button class="btn primary" id="btnAdminLogin">Login</button>
+            <button class="btn ghost" id="btnUseGuest">Guest</button>
+          </div>
+        </div>
+      </div>
+      <p class="small">ડિફોલ્ટ PIN: <b>1234</b>. કોડમાં બદલાઈ શકે છે.</p>
+    </div>
+
+    <!-- ADMIN DASHBOARD -->
+    <div id="adminArea" style="display:none">
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <h1>⚙️ Admin Dashboard</h1>
+          <div class="controls">
+            <button class="btn ghost" id="btnLogout">લૉગઆઉટ</button>
+            <button class="btn ghost" id="btnExportAll">Export CSV</button>
+            <button class="btn ghost" id="btnClearAll">Clear All</button>
+          </div>
+        </div>
+        <div class="grid2" style="margin-top:10px">
+          <div>
+            <h3 style="margin:0 0 8px">Department ઉમેરો</h3>
+            <label>Departmentનું નામ</label>
+            <input id="deptName" placeholder="જેમકે: Sales" />
+            <div style="margin-top:8px">
+              <button class="btn primary" id="btnAddDept">Add Department</button>
+            </div>
+            <div style="margin-top:10px">
+              <label>Departments</label>
+              <select id="deptList" size="4" style="height:120px"></select>
+            </div>
+          </div>
+
+          <div>
+            <h3 style="margin:0 0 8px">Employee ઉમેરો</h3>
+            <label>Name</label>
+            <input id="empName" placeholder="Staff name" />
+            <label style="margin-top:8px">Department</label>
+            <select id="empDept"></select>
+            <div class="row" style="margin-top:8px">
+              <div style="flex:1">
+                <label>Shift Start (HH:MM)</label>
+                <input id="shiftStart" type="time" value="09:00" />
+              </div>
+              <div style="width:120px">
+                <label>Shift End</label>
+                <input id="shiftEnd" type="time" value="18:00" />
+              </div>
+            </div>
+            <div style="margin-top:8px" class="row">
+              <button class="btn primary" id="btnAddEmp">Add Employee</button>
+              <button class="btn ghost" id="btnRegisterAuth">Register Fingerprint</button>
+            </div>
+            <p class="small">Register Fingerprint: પસંદ કરેલ કર્મચારી માટે WebAuthn credential બનાવશે.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Employees List -->
+      <div class="card">
+        <h3>Employees</h3>
+        <table>
+          <thead><tr><th>Name</th><th>Dept</th><th>Shift</th><th>Auth</th><th>Action</th></tr></thead>
+          <tbody id="empTable"></tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- EMPLOYEE VIEW -->
+    <div class="card" id="employeeArea" style="display:none">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <h2>👷 Attendance — Employee View</h2>
+        <div class="controls">
+          <select id="selectEmp"></select>
+          <button class="btn primary" id="btnPunch">🔒 Punch (Fingerprint)</button>
+          <button class="btn ghost" id="btnPunchPin">🔑 Punch (PIN)</button>
+          <button class="btn ghost" id="btnViewRecords">View Records</button>
+        </div>
+      </div>
+
+      <div style="margin-top:10px" id="empInfo"></div>
+
+      <div style="margin-top:10px">
+        <h3>આજે ની પસંદ કરેલી એન્ટ્રીઓ</h3>
+        <table>
+          <thead><tr><th>તારીખ</th><th>IN</th><th>OUT</th><th>Work</th><th>Late</th></tr></thead>
+          <tbody id="todayTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer>LocalStorage-based. WebAuthn સફળ વગર PIN fallback સાથે કામ કરે છે.</footer>
+  </div>
+
+  <script>
+    // ================= CONFIG ==================
+    const ADMIN_PIN = '1234';
+    const STORAGE_KEY = 'att_app_v2';
+    const TZ = 'Asia/Kolkata';
+
+    // ================= Storage helpers ==================
+    function load(){
+      try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{"departments":[],"employees":[],"records":[]}'); }
+      catch(e){ return {departments:[],employees:[],records:[]}; }
+    }
+    function save(obj){ localStorage.setItem(STORAGE_KEY, JSON.stringify(obj)); }
+
+    // ================= Utilities ==================
+    const $ = id => document.getElementById(id);
+    function uid(){ return Math.random().toString(36).slice(2,9); }
+    function nowLocalParts(){ const d=new Date(); const opts={timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',second:'2-digit',day:'2-digit',month:'2-digit',year:'numeric'}; const parts= new Intl.DateTimeFormat('en-GB',opts).formatToParts(d); const obj=Object.fromEntries(parts.map(p=>[p.type,p.value])); return {date:`${obj.year}-${obj.month}-${obj.day}`, time:`${obj.hour}:${obj.minute}:${obj.second}`, ts:d.toISOString()}; }
+    function timeToMinutes(t){ // 'HH:MM'
+      const [h,m]=t.split(':').map(Number); return h*60 + m;
+    }
+    function diffHHMM(startISO,endISO){ const s=new Date(startISO); const e=new Date(endISO); let diff=Math.floor((e-s)/1000); if(diff<0) diff=0; const hh=Math.floor(diff/3600); const mm=Math.floor((diff%3600)/60); return `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`; }
+
+    // ================= Initial Render ==================
+    function renderDepts(){ const s=load(); const sel=$('empDept'); const list=$('deptList'); sel.innerHTML=''; list.innerHTML=''; s.departments.forEach(d=>{ const o=document.createElement('option'); o.value=d.id; o.textContent=d.name; sel.appendChild(o); const o2=document.createElement('option'); o2.value=d.id; o2.textContent=d.name; list.appendChild(o2); }); }
+    function renderEmpTable(){ const s=load(); const tbody=$('empTable'); tbody.innerHTML=''; s.employees.forEach(emp=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${emp.name}</td><td>${(s.departments.find(d=>d.id===emp.dept)||{name:'-'}).name}</td><td>${emp.shiftStart} - ${emp.shiftEnd}</td><td>${emp.authId? 'Yes':'No'}</td><td><button data-id='${emp.id}' class='btn ghost btnDel'>Delete</button></td>`; tbody.appendChild(tr); }); document.querySelectorAll('.btnDel').forEach(b=>b.onclick=()=>{ if(confirm('Delete employee?')){ const id=b.dataset.id; const s=load(); s.employees=s.employees.filter(e=>e.id!==id); save(s); renderEmpTable(); renderSelectEmp(); }});
+    }
+    function renderSelectEmp(){ const s=load(); const sel=$('selectEmp'); sel.innerHTML=''; const opt0=document.createElement('option'); opt0.value=''; opt0.textContent='-- પસંદ કરો --'; sel.appendChild(opt0); s.employees.forEach(emp=>{ const o=document.createElement('option'); o.value=emp.id; o.textContent=emp.name + ' (' + (s.departments.find(d=>d.id===emp.dept)||{name:'-'}).name + ')'; sel.appendChild(o); }); }
+
+    function renderTodayFor(empId){ const s=load(); const emp=s.employees.find(e=>e.id===empId); if(!emp) { $('todayTable').innerHTML=''; $('empInfo').innerHTML=''; return; }
+      const info = `<div class='small'>Name: <b>${emp.name}</b> &nbsp; Dept: <b>${(s.departments.find(d=>d.id===emp.dept)||{name:'-'}).name}</b> &nbsp; Shift: <b>${emp.shiftStart} - ${emp.shiftEnd}</b></div>`;
+      $('empInfo').innerHTML = info;
+      const today = new Date().toLocaleDateString('en-CA',{timeZone:TZ});
+      const recs = s.records.filter(r=>r.empId===empId && r.date===today);
+      const tb = $('todayTable'); tb.innerHTML='';
+      if(recs.length===0){ tb.innerHTML=`<tr><td colspan='5' class='center small'>আজ রেকોર્ડ নেই</td></tr>`; return; }
+      recs.forEach(r=>{
+        const work = r.in && r.out? diffHHMM(r.inISO,r.outISO) : (r.in? 'In only':'-');
+        const late = r.in? ( timeToMinutes(r.in.split(':').slice(0,2).join(':')) > timeToMinutes(emp.shiftStart) ? 'Yes' : 'No' ): '-';
+        const tr=document.createElement('tr'); tr.innerHTML = `<td>${r.date}</td><td>${r.in||'-'}</td><td>${r.out||'-'}</td><td>${work}</td><td>${late}</td>`; tb.appendChild(tr);
+      });
+    }
+
+    // ================= Admin actions ==================
+    $('btnAddDept').onclick = ()=>{
+      const name=$('deptName').value.trim(); if(!name){ alert('નામ દાખલ કરો'); return; }
+      const s=load(); s.departments.push({id:uid(),name}); save(s); $('deptName').value=''; renderDepts(); renderEmpTable(); renderSelectEmp();
+    };
+
+    $('btnAddEmp').onclick = ()=>{
+      const name=$('empName').value.trim(); const dept=$('empDept').value; const shiftStart=$('shiftStart').value; const shiftEnd=$('shiftEnd').value;
+      if(!name||!dept){ alert('Name અને Department જરૂરી છે'); return; }
+      const s=load(); s.employees.push({id:uid(),name,dept,shiftStart,shiftEnd,authId:null}); save(s); $('empName').value=''; renderEmpTable(); renderSelectEmp();
+    };
+
+    // ================= WebAuthn helpers (simple, local) ==================
+    async function registerCredential(empId){
+      if(!window.PublicKeyCredential){ alert('WebAuthn આધારિત બ્રાઉઝર જરૂરી'); return null; }
+      const challenge = new Uint8Array(32);
+      window.crypto.getRandomValues(challenge);
+      const publicKey = {
+        challenge: challenge,
+        rp: {name: 'Local Attendance'},
+        user: {id: new TextEncoder().encode(empId), name: empId, displayName: empId},
+        pubKeyCredParams: [{type:'public-key', alg:-7}],
+        timeout: 60000,
+        authenticatorSelection: {authenticatorAttachment: 'platform', userVerification:'preferred'},
+        attestation: 'direct'
+      };
+      try{
+        const cred = await navigator.credentials.create({publicKey});
+        // store id
+        const rawId = new Uint8Array(cred.rawId);
+        const idStr = btoa(String.fromCharCode(...rawId));
+        const s=load(); const emp=s.employees.find(e=>e.id===empId); if(emp) emp.authId = idStr; save(s); renderEmpTable(); return idStr;
+      }catch(err){ console.error(err); alert('Registration failed: '+ (err.message||err)); return null; }
+    }
+
+    async function authenticateCredential(empId){
+      const s=load(); const emp=s.employees.find(e=>e.id===empId); if(!emp || !emp.authId){ alert('આ કર્મચારી માટે ક્યું પણ authenticator register નથી.'); return false; }
+      try{
+        const raw = atob(emp.authId);
+        const id = Uint8Array.from(raw.split('').map(c=>c.charCodeAt(0)));
+        const publicKey = { challenge: Uint8Array.from(window.crypto.getRandomValues(new Uint8Array(32))), allowCredentials: [{id, type:'public-key'}], timeout:60000, userVerification:'preferred' };
+        const assertion = await navigator.credentials.get({publicKey});
+        return true;
+      }catch(err){ console.error(err); alert('Authenticate failed: '+(err.message||err)); return false; }
+    }
+
+    // ================= Register fingerprint for selected employee ==================
+    $('btnRegisterAuth').onclick = async ()=>{
+      const sel=$('selectEmp').value || ''; // try select
+      const s=load(); const emp = s.employees[s.employees.length-1] || s.employees[0];
+      // Try to register last added if none selected
+      let empId = emp? emp.id : null;
+      if(!empId){ alert('No employee'); return; }
+      const ok = await registerCredential(empId);
+      if(ok) alert('Registered for employee id: '+empId);
+    };
+
+    // When admin clicks register: we will pick employee selected in empDept list? Better to let admin select from emp list
+
+    // ================= Punch logic ==================
+    async function doPunch(empId, method='webauthn'){ // method: 'webauthn' | 'pin'
+      if(!empId){ alert('કર્મચારી પસંદ કરો'); return; }
+      const s=load(); const emp = s.employees.find(e=>e.id===empId);
+      if(!emp) return;
+      // authenticate
+      let ok=false;
+      if(method==='webauthn'){
+        if(!emp.authId){ if(!confirm('આ કર્મચારી માટે WebAuthn register નથી. PINથી անում?')) return; ok = false; }
+        else ok = await authenticateCredential(empId);
+      }
+      if(method==='pin'){
+        const pin = prompt('તમારો PIN દાખલ કરો'); if(pin===ADMIN_PIN) ok=true; else { alert('PIN ખોટો'); ok=false; }
+      }
+      if(method==='webauthn' && !emp.authId && !ok){ // user chose register? Let's prompt to register
+        if(confirm('Register કરવાનો છે?')){ const reg = await registerCredential(empId); if(reg) ok=true; }
+      }
+      if(!ok && emp.authId) { /* if webauthn failed */ return; }
+
+      // Save record
+      const parts = nowLocalParts(); const today = parts.date; const recs = s.records.filter(r=>r.empId===empId && r.date===today);
+      if(recs.length===0){ // first punch -> IN
+        const r = {id:uid(),empId,date:today,in:parts.time,inISO:parts.ts,out:null,outISO:null}; s.records.push(r); save(s); renderTodayFor(empId); alert('IN saved at '+parts.time); }
+      else{
+        // find last open rec
+        const last = s.records.filter(r=>r.empId===empId && r.date===today).slice(-1)[0];
+        if(last && !last.out){ last.out = parts.time; last.outISO = parts.ts; save(s); renderTodayFor(empId); alert('OUT saved at '+parts.time); }
+        else{ // start new in
+          const r = {id:uid(),empId,date:today,in:parts.time,inISO:parts.ts,out:null,outISO:null}; s.records.push(r); save(s); renderTodayFor(empId); alert('IN saved at '+parts.time); }
+      }
+    }
+
+    $('btnPunch').onclick = async ()=>{ const empId = $('selectEmp').value; await doPunch(empId,'webauthn'); };
+    $('btnPunchPin').onclick = async ()=>{ const empId = $('selectEmp').value; await doPunch(empId,'pin'); };
+
+      // ================= Export / Clear ==================
+      $('btnExportAll').onclick = () => {
+          const s = load();
+          const rows = [];
+          rows.push(['EmpName', 'Dept', 'Date', 'In', 'Out', 'Work(HH:MM)', 'Late']);
+
+          s.records.forEach(r => {
+              const emp = s.employees.find(e => e.id === r.empId) || { name: '-' };
+              const dept = s.departments.find(d => d.id === emp.dept) || { name: '-' };
+              const work = (r.in && r.out) ? diffHHMM(r.inISO, r.outISO) : '';
+              const late = r.in
+                  ? (timeToMinutes(r.in.split(':').slice(0, 2).join(':')) > timeToMinutes(emp.shiftStart) ? 'Yes' : 'No')
+                  : '';
+              rows.push([
+                  emp.name,
+                  dept.name,
+                  r.date,
+                  r.in || '',
+                  r.out || '',
+                  work,
+                  late
+              ]);
+          });
+
+          // ✅ FIX: Properly join rows with newlines
+          const csv = rows.map(r =>
+              r.map(c => `"${String(c || '').replace(/"/g, '""')}"`).join(',')
+          ).join('\n');
+
+          const blob = new Blob([csv], { type: 'text/csv' });
+          const url = URL.createObjectURL(blob);
+
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'attendance_all.csv';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+
+          URL.revokeObjectURL(url);
+      };
+
+
+    $('btnClearAll').onclick = ()=>{ if(confirm('All data will be removed. Continue?')){ localStorage.removeItem(STORAGE_KEY); location.reload(); } };
+
+    // ================= Auth flow ==================
+    $('btnAdminLogin').onclick = ()=>{
+      const pin = $('adminPin').value.trim(); if(pin===ADMIN_PIN){ $('authCard').style.display='none'; $('adminArea').style.display='block'; $('employeeArea').style.display='block'; renderDepts(); renderEmpTable(); renderSelectEmp(); } else { alert('PIN ખોટો'); } };
+    $('btnUseGuest').onclick = ()=>{ $('authCard').style.display='none'; $('adminArea').style.display='none'; $('employeeArea').style.display='block'; renderDepts(); renderEmpTable(); renderSelectEmp(); };
+    $('btnLogout').onclick = ()=>{ location.reload(); };
+
+    // When employee selection changes
+    $('selectEmp').onchange = ()=>{ renderTodayFor($('selectEmp').value); };
+
+    // initial
+    (function init(){ const s=load(); renderDepts(); renderEmpTable(); renderSelectEmp(); })();
+
+  </script>
+</body>
+</html>
