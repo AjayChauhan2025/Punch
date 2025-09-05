@@ -1,460 +1,418 @@
-<!doctype html>
-<html lang="gu">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Attendance App — Admin + Employee (Gujarati)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gujarati:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Image Maker — Prompt → Image</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --bg: #ffffff; /* background હવે white */
-            --card: #f9fafb; /* card હવે very light gray */
-            --muted: #6b7280;
-            --txt: #111827; /* text હવે dark */
-            --accent: #10b981;
-            --accent2: #3b82f6;
-            --danger: #ef4444;
-        }
-
-        * {
-            box-sizing: border-box
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Noto Sans Gujarati',system-ui,-apple-system,Segoe UI,Roboto,Arial;
-            margin: 0;
-            background: var(--bg);
-            color: var(--txt);
-            padding: 14px;
-        }
-
-        .wrap {
-            max-width: 980px;
-            margin: 0 auto
+            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji';
         }
 
         .card {
-            background: var(--card);
-            border: 1px solid #e5e7eb;
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 12px;
-        }
-
-        h1 {
-            margin: 0;
-            font-size: 20px
-        }
-
-        label {
-            font-size: 13px;
-            color: var(--muted);
-            display: block;
-            margin-bottom: 6px
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            background: #ffffff;
-            border: 1px solid #d1d5db;
-            color: var(--txt);
-        }
-
-        .row {
-            display: flex;
-            gap: 8px;
-            align-items: center
-        }
-
-        .col {
-            flex: 1
+            box-shadow: 0 10px 25px rgba(0,0,0,.08);
+            border-radius: 1.25rem;
+            background: #fff;
+            padding: 1rem;
         }
 
         .btn {
-            border: 0;
-            padding: 10px 12px;
-            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            font-weight: 600
+            display: inline-block;
+            transition: all 0.2s ease;
         }
 
-            .btn.primary {
-                background: var(--accent);
-                color: white
+        .btn-primary {
+            background: black;
+            color: white;
+        }
+
+            .btn-primary:hover {
+                background: #333;
             }
 
-            .btn.secondary {
-                background: var(--accent2);
-                color: white
+            .btn-primary:active {
+                transform: scale(0.98);
             }
 
-            .btn.ghost {
-                background: transparent;
-                border: 1px solid #d1d5db;
-                color: var(--txt)
+        .btn-ghost {
+            background: white;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+
+            .btn-ghost:hover {
+                background: #f9f9f9;
             }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 8px
-        }
-
-        th, td {
-            padding: 8px;
-            border-bottom: 1px solid #e5e7eb;
-            text-align: left;
-            font-size: 13px;
-        }
-
-        .small {
-            font-size: 12px;
-            color: var(--muted)
-        }
 
         .badge {
-            padding: 6px 8px;
-            border-radius: 999px;
-            background: #f3f4f6;
-            font-size: 12px;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            background: #f3f3f3;
+            border: 1px solid #ddd;
+            display: inline-block;
         }
 
-        .grid2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px
+        .spin {
+            animation: spin 1s linear infinite;
         }
 
-        .danger {
-            color: var(--danger)
-        }
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
 
-        .center {
-            text-align: center
-        }
-
-        footer {
-            font-size: 12px;
-            color: var(--muted);
-            text-align: center;
-            margin-top: 8px
-        }
-
-        .controls {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap
+            to {
+                transform: rotate(360deg);
+            }
         }
     </style>
 
 </head>
-<body>
-  <div class="wrap">
-    <div class="card">
-      <h1>📋 Attendance System (Admin + Employee)</h1>
-      <p class="small">ફિંગરપ્રિન્ટ (WebAuthn) પરથી punch કરવા માટે Register/Authenticate કરવાની સજ્જતા. Data LocalStorage માં રહેશે — જરૂર હોય તો પછી Firebase જોડશે.</p>
-    </div>
-
-    <!-- AUTH / ADMIN PIN -->
-    <div class="card" id="authCard">
-      <div class="row">
-        <div class="col">
-          <label>એડમિન PIN</label>
-          <input id="adminPin" type="password" placeholder="એડમિન PIN દાખલ કરો" />
-        </div>
-        <div style="width:180px">
-          <label>&nbsp;</label>
-          <div class="row">
-            <button class="btn primary" id="btnAdminLogin">Login</button>
-            <button class="btn ghost" id="btnUseGuest">Guest</button>
-          </div>
-        </div>
+<body class="bg-gradient-to-b from-gray-50 to-white text-gray-900">
+  <div class="max-w-6xl mx-auto p-6 md:p-10">
+    <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
+      <div>
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">AI Image Maker</h1>
+        <p class="text-gray-600 mt-1">Prompt લખો → Image મેળવો. Size બદલો, download કરો. (No server required for demo provider)</p>
       </div>
-      <p class="small">ડિફોલ્ટ PIN: <b>1234</b>. કોડમાં બદલાઈ શકે છે.</p>
-    </div>
+      <div class="flex items-center gap-3">
+        <span class="badge">Client-only</span>
+        <span class="badge">Resize & Download</span>
+      </div>
+    </header>
 
-    <!-- ADMIN DASHBOARD -->
-    <div id="adminArea" style="display:none">
-      <div class="card">
-        <div class="row" style="justify-content:space-between;align-items:center">
-          <h1>⚙️ Admin Dashboard</h1>
-          <div class="controls">
-            <button class="btn ghost" id="btnLogout">લૉગઆઉટ</button>
-            <button class="btn ghost" id="btnExportAll">Export CSV</button>
-            <button class="btn ghost" id="btnClearAll">Clear All</button>
+    <!-- Controls Card -->
+    <section class="card bg-white p-6 md:p-8">
+      <div class="grid md:grid-cols-5 gap-4 md:gap-6">
+        <div class="md:col-span-3">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Prompt</label>
+          <textarea id="prompt" class="w-full rounded-xl border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-black" rows="3" placeholder="e.g., ‘a cute chubby girl with long braids, standing outside home, holding a bag, 3D Pixar style’"></textarea>
+          <div class="flex items-center gap-2 mt-2">
+            <button id="ex1" class="btn btn-ghost text-sm">Use Example 1</button>
+            <button id="ex2" class="btn btn-ghost text-sm">Use Example 2</button>
           </div>
         </div>
-        <div class="grid2" style="margin-top:10px">
+
+        <div class="md:col-span-2 grid grid-cols-2 gap-4">
           <div>
-            <h3 style="margin:0 0 8px">Department ઉમેરો</h3>
-            <label>Departmentનું નામ</label>
-            <input id="deptName" placeholder="જેમકે: Sales" />
-            <div style="margin-top:8px">
-              <button class="btn primary" id="btnAddDept">Add Department</button>
-            </div>
-            <div style="margin-top:10px">
-              <label>Departments</label>
-              <select id="deptList" size="4" style="height:120px"></select>
-            </div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Preset Size</label>
+            <select id="presetSize" class="w-full rounded-xl border border-gray-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-black">
+              <option value="512x512">512 × 512</option>
+              <option value="768x768">768 × 768</option>
+              <option value="1024x1024" selected>1024 × 1024</option>
+              <option value="custom">Custom…</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Count</label>
+            <input id="count" type="number" min="1" max="4" value="1" class="w-full rounded-xl border border-gray-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-black" />
           </div>
 
-          <div>
-            <h3 style="margin:0 0 8px">Employee ઉમેરો</h3>
-            <label>Name</label>
-            <input id="empName" placeholder="Staff name" />
-            <label style="margin-top:8px">Department</label>
-            <select id="empDept"></select>
-            <div class="row" style="margin-top:8px">
-              <div style="flex:1">
-                <label>Shift Start (HH:MM)</label>
-                <input id="shiftStart" type="time" value="09:00" />
+          <div class="col-span-2 hidden" id="customSizeRow">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Width (px)</label>
+                <input id="width" type="number" value="1024" min="64" max="2048" class="w-full rounded-xl border border-gray-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-black" />
               </div>
-              <div style="width:120px">
-                <label>Shift End</label>
-                <input id="shiftEnd" type="time" value="18:00" />
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Height (px)</label>
+                <input id="height" type="number" value="1024" min="64" max="2048" class="w-full rounded-xl border border-gray-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-black" />
               </div>
             </div>
-            <div style="margin-top:8px" class="row">
-              <button class="btn primary" id="btnAddEmp">Add Employee</button>
-              <button class="btn ghost" id="btnRegisterAuth">Register Fingerprint</button>
-            </div>
-            <p class="small">Register Fingerprint: પસંદ કરેલ કર્મચારી માટે WebAuthn credential બનાવશે.</p>
+            <p class="text-xs text-gray-500 mt-2">Tip: Large sizes may take longer to load.</p>
+          </div>
+
+          <div class="col-span-2 flex items-end gap-3">
+            <button id="generateBtn" class="btn btn-primary flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M11.725 2.836a.75.75 0 0 1 .55 0l8.25 3.3a.75.75 0 0 1 0 1.387l-8.25 3.3a.75.75 0 0 1-.55 0l-8.25-3.3a.75.75 0 0 1 0-1.387l8.25-3.3Z"/><path d="M3 10.5l8.25 3.3a.75.75 0 0 0 .55 0L20.5 10.5v6.75a.75.75 0 0 1-.477.698l-8.25 3.3a.75.75 0 0 1-.546 0l-8.25-3.3A.75.75 0 0 1 3 17.25V10.5Z"/></svg>
+              Generate</button>
+            <button id="clearBtn" class="btn btn-ghost">Clear</button>
           </div>
         </div>
       </div>
 
-      <!-- Employees List -->
-      <div class="card">
-        <h3>Employees</h3>
-        <table>
-          <thead><tr><th>Name</th><th>Dept</th><th>Shift</th><th>Auth</th><th>Action</th></tr></thead>
-          <tbody id="empTable"></tbody>
-        </table>
-      </div>
-
-    </div>
-
-    <!-- EMPLOYEE VIEW -->
-    <div class="card" id="employeeArea" style="display:none">
-      <div class="row" style="justify-content:space-between;align-items:center">
-        <h2>👷 Attendance — Employee View</h2>
-        <div class="controls">
-          <select id="selectEmp"></select>
-          <button class="btn primary" id="btnPunch">🔒 Punch (Fingerprint)</button>
-          <button class="btn ghost" id="btnPunchPin">🔑 Punch (PIN)</button>
-          <button class="btn ghost" id="btnViewRecords">View Records</button>
+      <details class="mt-6">
+        <summary class="cursor-pointer text-sm text-gray-700">Advanced: Provider Settings</summary>
+        <div class="mt-4 grid md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Provider</label>
+            <select id="provider" class="w-full rounded-xl border border-gray-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-black">
+              <option value="pollinations" selected>Pollinations (no key, demo)</option>
+              <option value="openai_direct">OpenAI — images/generations (exposes key)</option>
+              <option value="custom_proxy">Custom Proxy (recommended)</option>
+            </select>
+            <p class="text-xs text-gray-500 mt-2">Use <b>Pollinations</b> to test without any API key. For production, set up a server proxy and choose <b>Custom Proxy</b>.</p>
+          </div>
+          <div id="apiKeyWrap" class="hidden">
+            <label class="block text-sm font-medium text-gray-700 mb-2">API Key</label>
+            <input id="apiKey" type="password" placeholder="sk-..." class="w-full rounded-xl border border-gray-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-black" />
+            <p class="text-xs text-amber-600 mt-2">Warning: Using keys in the browser exposes them. Prefer <b>Custom Proxy</b>.</p>
+          </div>
+          <div id="endpointWrap" class="hidden">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Proxy Endpoint URL</label>
+            <input id="endpoint" type="text" placeholder="https://your-domain.com/api/generate" class="w-full rounded-xl border border-gray-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-black" />
+            <p class="text-xs text-gray-500 mt-2">Your server should accept JSON { prompt, width, height, count } and return an array of image URLs or base64 strings.</p>
+          </div>
         </div>
+      </details>
+    </section>
+
+    <!-- Results -->
+    <section class="mt-8">
+      <div id="status" class="hidden items-center gap-2 text-sm text-gray-600">
+        <svg class="w-4 h-4 spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
+        <span id="statusText">Generating…</span>
       </div>
+      <div id="gallery" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4"></div>
+    </section>
 
-      <div style="margin-top:10px" id="empInfo"></div>
-
-      <div style="margin-top:10px">
-        <h3>આજે ની પસંદ કરેલી એન્ટ્રીઓ</h3>
-        <table>
-          <thead><tr><th>તારીખ</th><th>IN</th><th>OUT</th><th>Work</th><th>Late</th></tr></thead>
-          <tbody id="todayTable"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <footer>LocalStorage-based. WebAuthn સફળ વગર PIN fallback સાથે કામ કરે છે.</footer>
+    <footer class="mt-10 text-xs text-gray-500">
+      <p>Note: Some providers return images without CORS headers; in those cases, in-browser pixel-resize & re-download may be blocked by the browser’s security. You can still view & CSS-resize, or use a proxy to add proper CORS headers for editing.</p>
+    </footer>
   </div>
 
+  <template id="imgCardTpl">
+    <div class="card bg-white overflow-hidden">
+      <div class="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
+        <img class="w-full h-full object-contain" crossorigin="anonymous" />
+      </div>
+      <div class="p-4 border-t border-gray-100 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs text-gray-500"><span class="wVal">—</span> × <span class="hVal">—</span> px</span>
+          <div class="flex gap-2">
+            <button class="btn btn-ghost text-xs downloadBtn">Download</button>
+            <button class="btn btn-ghost text-xs copyLinkBtn">Copy Link</button>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <input class="resizeW w-full rounded-xl border border-gray-300 p-2 text-sm" type="number" min="32" value="1024" />
+          <input class="resizeH w-full rounded-xl border border-gray-300 p-2 text-sm" type="number" min="32" value="1024" />
+          <button class="btn btn-primary text-xs resizeBtn">Resize</button>
+        </div>
+        <p class="text-[11px] text-gray-500">If resize fails, provider likely blocked canvas (CORS). Use proxy mode.</p>
+      </div>
+    </div>
+  </template>
+
   <script>
-    // ================= CONFIG ==================
-    const ADMIN_PIN = '1234';
-    const STORAGE_KEY = 'att_app_v2';
-    const TZ = 'Asia/Kolkata';
+    const $ = (s, p=document) => p.querySelector(s);
+    const $$ = (s, p=document) => Array.from(p.querySelectorAll(s));
 
-    // ================= Storage helpers ==================
-    function load(){
-      try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{"departments":[],"employees":[],"records":[]}'); }
-      catch(e){ return {departments:[],employees:[],records:[]}; }
+    const promptEl = $('#prompt');
+    const presetSizeEl = $('#presetSize');
+    const customSizeRow = $('#customSizeRow');
+    const widthEl = $('#width');
+    const heightEl = $('#height');
+    const countEl = $('#count');
+    const providerEl = $('#provider');
+    const apiKeyWrap = $('#apiKeyWrap');
+    const apiKeyEl = $('#apiKey');
+    const endpointWrap = $('#endpointWrap');
+    const endpointEl = $('#endpoint');
+
+    const statusWrap = $('#status');
+    const statusText = $('#statusText');
+    const gallery = $('#gallery');
+
+    $('#ex1').addEventListener('click', () => {
+      promptEl.value = 'Cute chubby Gujarati girl with long braids, standing outside home holding a bag, ready for vegetable market, 3D Pixar style, vibrant soft light';
+    });
+    $('#ex2').addEventListener('click', () => {
+      promptEl.value = 'Realistic fresh vegetable market scene in India, colorful stalls, soft morning light, cinematic depth of field';
+    });
+
+    presetSizeEl.addEventListener('change', () => {
+      if (presetSizeEl.value === 'custom') customSizeRow.classList.remove('hidden');
+      else {
+        customSizeRow.classList.add('hidden');
+        const [w, h] = presetSizeEl.value.split('x').map(Number);
+        widthEl.value = w; heightEl.value = h;
+      }
+    });
+
+    providerEl.addEventListener('change', () => {
+      const p = providerEl.value;
+      apiKeyWrap.classList.toggle('hidden', p !== 'openai_direct');
+      endpointWrap.classList.toggle('hidden', p !== 'custom_proxy');
+    });
+
+    $('#clearBtn').addEventListener('click', () => {
+      promptEl.value = '';
+      gallery.innerHTML = '';
+    });
+
+    $('#generateBtn').addEventListener('click', async () => {
+      const prompt = promptEl.value.trim();
+      if (!prompt) { alert('Please enter a prompt.'); return; }
+
+      const count = Math.max(1, Math.min(4, Number(countEl.value)||1));
+      const w = Math.max(64, Math.min(2048, Number(widthEl.value)||1024));
+      const h = Math.max(64, Math.min(2048, Number(heightEl.value)||1024));
+
+      gallery.innerHTML = '';
+      statusWrap.classList.remove('hidden');
+      statusText.textContent = 'Generating…';
+
+      try {
+        const urls = await generateImages({ prompt, count, width: w, height: h });
+        statusText.textContent = 'Rendering…';
+        for (const url of urls) {
+          addImageCard(url, w, h);
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Generation failed: ' + (err?.message || err));
+      } finally {
+        statusWrap.classList.add('hidden');
+      }
+    });
+
+    async function generateImages({ prompt, count, width, height }) {
+      const provider = providerEl.value;
+
+      if (provider === 'pollinations') {
+        // Pollinations public endpoint (no key). Adds width/height; may not send CORS headers.
+        // We use distinct seeds for multiple images using a simple counter.
+        const base = 'https://image.pollinations.ai/prompt/';
+        const urls = Array.from({ length: count }, (_, i) => {
+          const seed = encodeURIComponent(prompt + ' ::seed ' + Date.now() + '-' + i);
+          return `${base}${seed}?width=${width}&height=${height}`;
+        });
+        return urls;
+      }
+
+      if (provider === 'openai_direct') {
+        const key = apiKeyEl.value.trim();
+        if (!key) throw new Error('Enter your OpenAI API key.');
+        // Direct call to OpenAI Images API (exposes key in browser — use only for testing!)
+        const resp = await fetch('https://api.openai.com/v1/images/generations', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${key}`
+          },
+          body: JSON.stringify({
+            model: 'gpt-image-1', // image generation model
+            prompt,
+            n: count,
+            size: `${width}x${height}`
+          })
+        });
+        if (!resp.ok) throw new Error('OpenAI error: ' + resp.status);
+        const data = await resp.json();
+        // API returns base64 URLs or URL links depending on account; normalize to data URLs if needed
+        const urls = data.data.map(d => d.url || ('data:image/png;base64,' + d.b64_json));
+        return urls;
+      }
+
+      if (provider === 'custom_proxy') {
+        const endpoint = endpointEl.value.trim();
+        if (!endpoint) throw new Error('Enter your proxy endpoint URL.');
+        const resp = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt, width, height, count })
+        });
+        if (!resp.ok) throw new Error('Proxy error: ' + resp.status);
+        const data = await resp.json();
+        // Expecting: { images: [urlOrBase64, ...] }
+        return data.images || [];
+      }
+
+      throw new Error('Unknown provider.');
     }
-    function save(obj){ localStorage.setItem(STORAGE_KEY, JSON.stringify(obj)); }
 
-    // ================= Utilities ==================
-    const $ = id => document.getElementById(id);
-    function uid(){ return Math.random().toString(36).slice(2,9); }
-    function nowLocalParts(){ const d=new Date(); const opts={timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',second:'2-digit',day:'2-digit',month:'2-digit',year:'numeric'}; const parts= new Intl.DateTimeFormat('en-GB',opts).formatToParts(d); const obj=Object.fromEntries(parts.map(p=>[p.type,p.value])); return {date:`${obj.year}-${obj.month}-${obj.day}`, time:`${obj.hour}:${obj.minute}:${obj.second}`, ts:d.toISOString()}; }
-    function timeToMinutes(t){ // 'HH:MM'
-      const [h,m]=t.split(':').map(Number); return h*60 + m;
-    }
-    function diffHHMM(startISO,endISO){ const s=new Date(startISO); const e=new Date(endISO); let diff=Math.floor((e-s)/1000); if(diff<0) diff=0; const hh=Math.floor(diff/3600); const mm=Math.floor((diff%3600)/60); return `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`; }
+    function addImageCard(src, w, h) {
+      const tpl = $('#imgCardTpl');
+      const node = tpl.content.firstElementChild.cloneNode(true);
+      const img = $('img', node);
+      const wVal = $('.wVal', node);
+      const hVal = $('.hVal', node);
+      const resizeW = $('.resizeW', node);
+      const resizeH = $('.resizeH', node);
+      const resizeBtn = $('.resizeBtn', node);
+      const downloadBtn = $('.downloadBtn', node);
+      const copyLinkBtn = $('.copyLinkBtn', node);
 
-    // ================= Initial Render ==================
-    function renderDepts(){ const s=load(); const sel=$('empDept'); const list=$('deptList'); sel.innerHTML=''; list.innerHTML=''; s.departments.forEach(d=>{ const o=document.createElement('option'); o.value=d.id; o.textContent=d.name; sel.appendChild(o); const o2=document.createElement('option'); o2.value=d.id; o2.textContent=d.name; list.appendChild(o2); }); }
-    function renderEmpTable(){ const s=load(); const tbody=$('empTable'); tbody.innerHTML=''; s.employees.forEach(emp=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${emp.name}</td><td>${(s.departments.find(d=>d.id===emp.dept)||{name:'-'}).name}</td><td>${emp.shiftStart} - ${emp.shiftEnd}</td><td>${emp.authId? 'Yes':'No'}</td><td><button data-id='${emp.id}' class='btn ghost btnDel'>Delete</button></td>`; tbody.appendChild(tr); }); document.querySelectorAll('.btnDel').forEach(b=>b.onclick=()=>{ if(confirm('Delete employee?')){ const id=b.dataset.id; const s=load(); s.employees=s.employees.filter(e=>e.id!==id); save(s); renderEmpTable(); renderSelectEmp(); }});
-    }
-    function renderSelectEmp(){ const s=load(); const sel=$('selectEmp'); sel.innerHTML=''; const opt0=document.createElement('option'); opt0.value=''; opt0.textContent='-- પસંદ કરો --'; sel.appendChild(opt0); s.employees.forEach(emp=>{ const o=document.createElement('option'); o.value=emp.id; o.textContent=emp.name + ' (' + (s.departments.find(d=>d.id===emp.dept)||{name:'-'}).name + ')'; sel.appendChild(o); }); }
-
-    function renderTodayFor(empId){ const s=load(); const emp=s.employees.find(e=>e.id===empId); if(!emp) { $('todayTable').innerHTML=''; $('empInfo').innerHTML=''; return; }
-      const info = `<div class='small'>Name: <b>${emp.name}</b> &nbsp; Dept: <b>${(s.departments.find(d=>d.id===emp.dept)||{name:'-'}).name}</b> &nbsp; Shift: <b>${emp.shiftStart} - ${emp.shiftEnd}</b></div>`;
-      $('empInfo').innerHTML = info;
-      const today = new Date().toLocaleDateString('en-CA',{timeZone:TZ});
-      const recs = s.records.filter(r=>r.empId===empId && r.date===today);
-      const tb = $('todayTable'); tb.innerHTML='';
-      if(recs.length===0){ tb.innerHTML=`<tr><td colspan='5' class='center small'>আজ রেকોર્ડ নেই</td></tr>`; return; }
-      recs.forEach(r=>{
-        const work = r.in && r.out? diffHHMM(r.inISO,r.outISO) : (r.in? 'In only':'-');
-        const late = r.in? ( timeToMinutes(r.in.split(':').slice(0,2).join(':')) > timeToMinutes(emp.shiftStart) ? 'Yes' : 'No' ): '-';
-        const tr=document.createElement('tr'); tr.innerHTML = `<td>${r.date}</td><td>${r.in||'-'}</td><td>${r.out||'-'}</td><td>${work}</td><td>${late}</td>`; tb.appendChild(tr);
+      img.src = src;
+      img.addEventListener('load', () => {
+        wVal.textContent = img.naturalWidth; hVal.textContent = img.naturalHeight;
+        resizeW.value = img.naturalWidth; resizeH.value = img.naturalHeight;
       });
-    }
 
-    // ================= Admin actions ==================
-    $('btnAddDept').onclick = ()=>{
-      const name=$('deptName').value.trim(); if(!name){ alert('નામ દાખલ કરો'); return; }
-      const s=load(); s.departments.push({id:uid(),name}); save(s); $('deptName').value=''; renderDepts(); renderEmpTable(); renderSelectEmp();
-    };
+      copyLinkBtn.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(src); alert('Link copied.'); } catch {}
+      });
 
-    $('btnAddEmp').onclick = ()=>{
-      const name=$('empName').value.trim(); const dept=$('empDept').value; const shiftStart=$('shiftStart').value; const shiftEnd=$('shiftEnd').value;
-      if(!name||!dept){ alert('Name અને Department જરૂરી છે'); return; }
-      const s=load(); s.employees.push({id:uid(),name,dept,shiftStart,shiftEnd,authId:null}); save(s); $('empName').value=''; renderEmpTable(); renderSelectEmp();
-    };
-
-    // ================= WebAuthn helpers (simple, local) ==================
-    async function registerCredential(empId){
-      if(!window.PublicKeyCredential){ alert('WebAuthn આધારિત બ્રાઉઝર જરૂરી'); return null; }
-      const challenge = new Uint8Array(32);
-      window.crypto.getRandomValues(challenge);
-      const publicKey = {
-        challenge: challenge,
-        rp: {name: 'Local Attendance'},
-        user: {id: new TextEncoder().encode(empId), name: empId, displayName: empId},
-        pubKeyCredParams: [{type:'public-key', alg:-7}],
-        timeout: 60000,
-        authenticatorSelection: {authenticatorAttachment: 'platform', userVerification:'preferred'},
-        attestation: 'direct'
-      };
-      try{
-        const cred = await navigator.credentials.create({publicKey});
-        // store id
-        const rawId = new Uint8Array(cred.rawId);
-        const idStr = btoa(String.fromCharCode(...rawId));
-        const s=load(); const emp=s.employees.find(e=>e.id===empId); if(emp) emp.authId = idStr; save(s); renderEmpTable(); return idStr;
-      }catch(err){ console.error(err); alert('Registration failed: '+ (err.message||err)); return null; }
-    }
-
-    async function authenticateCredential(empId){
-      const s=load(); const emp=s.employees.find(e=>e.id===empId); if(!emp || !emp.authId){ alert('આ કર્મચારી માટે ક્યું પણ authenticator register નથી.'); return false; }
-      try{
-        const raw = atob(emp.authId);
-        const id = Uint8Array.from(raw.split('').map(c=>c.charCodeAt(0)));
-        const publicKey = { challenge: Uint8Array.from(window.crypto.getRandomValues(new Uint8Array(32))), allowCredentials: [{id, type:'public-key'}], timeout:60000, userVerification:'preferred' };
-        const assertion = await navigator.credentials.get({publicKey});
-        return true;
-      }catch(err){ console.error(err); alert('Authenticate failed: '+(err.message||err)); return false; }
-    }
-
-    // ================= Register fingerprint for selected employee ==================
-    $('btnRegisterAuth').onclick = async ()=>{
-      const sel=$('selectEmp').value || ''; // try select
-      const s=load(); const emp = s.employees[s.employees.length-1] || s.employees[0];
-      // Try to register last added if none selected
-      let empId = emp? emp.id : null;
-      if(!empId){ alert('No employee'); return; }
-      const ok = await registerCredential(empId);
-      if(ok) alert('Registered for employee id: '+empId);
-    };
-
-    // When admin clicks register: we will pick employee selected in empDept list? Better to let admin select from emp list
-
-    // ================= Punch logic ==================
-    async function doPunch(empId, method='webauthn'){ // method: 'webauthn' | 'pin'
-      if(!empId){ alert('કર્મચારી પસંદ કરો'); return; }
-      const s=load(); const emp = s.employees.find(e=>e.id===empId);
-      if(!emp) return;
-      // authenticate
-      let ok=false;
-      if(method==='webauthn'){
-        if(!emp.authId){ if(!confirm('આ કર્મચારી માટે WebAuthn register નથી. PINથી անում?')) return; ok = false; }
-        else ok = await authenticateCredential(empId);
-      }
-      if(method==='pin'){
-        const pin = prompt('તમારો PIN દાખલ કરો'); if(pin===ADMIN_PIN) ok=true; else { alert('PIN ખોટો'); ok=false; }
-      }
-      if(method==='webauthn' && !emp.authId && !ok){ // user chose register? Let's prompt to register
-        if(confirm('Register કરવાનો છે?')){ const reg = await registerCredential(empId); if(reg) ok=true; }
-      }
-      if(!ok && emp.authId) { /* if webauthn failed */ return; }
-
-      // Save record
-      const parts = nowLocalParts(); const today = parts.date; const recs = s.records.filter(r=>r.empId===empId && r.date===today);
-      if(recs.length===0){ // first punch -> IN
-        const r = {id:uid(),empId,date:today,in:parts.time,inISO:parts.ts,out:null,outISO:null}; s.records.push(r); save(s); renderTodayFor(empId); alert('IN saved at '+parts.time); }
-      else{
-        // find last open rec
-        const last = s.records.filter(r=>r.empId===empId && r.date===today).slice(-1)[0];
-        if(last && !last.out){ last.out = parts.time; last.outISO = parts.ts; save(s); renderTodayFor(empId); alert('OUT saved at '+parts.time); }
-        else{ // start new in
-          const r = {id:uid(),empId,date:today,in:parts.time,inISO:parts.ts,out:null,outISO:null}; s.records.push(r); save(s); renderTodayFor(empId); alert('IN saved at '+parts.time); }
-      }
-    }
-
-    $('btnPunch').onclick = async ()=>{ const empId = $('selectEmp').value; await doPunch(empId,'webauthn'); };
-    $('btnPunchPin').onclick = async ()=>{ const empId = $('selectEmp').value; await doPunch(empId,'pin'); };
-
-      // ================= Export / Clear ==================
-      $('btnExportAll').onclick = () => {
-          const s = load();
-          const rows = [];
-          rows.push(['EmpName', 'Dept', 'Date', 'In', 'Out', 'Work(HH:MM)', 'Late']);
-
-          s.records.forEach(r => {
-              const emp = s.employees.find(e => e.id === r.empId) || { name: '-' };
-              const dept = s.departments.find(d => d.id === emp.dept) || { name: '-' };
-              const work = (r.in && r.out) ? diffHHMM(r.inISO, r.outISO) : '';
-              const late = r.in
-                  ? (timeToMinutes(r.in.split(':').slice(0, 2).join(':')) > timeToMinutes(emp.shiftStart) ? 'Yes' : 'No')
-                  : '';
-              rows.push([
-                  emp.name,
-                  dept.name,
-                  r.date,
-                  r.in || '',
-                  r.out || '',
-                  work,
-                  late
-              ]);
-          });
-
-          // ✅ FIX: Properly join rows with newlines
-          const csv = rows.map(r =>
-              r.map(c => `"${String(c || '').replace(/"/g, '""')}"`).join(',')
-          ).join('\n');
-
-          const blob = new Blob([csv], { type: 'text/csv' });
-          const url = URL.createObjectURL(blob);
-
+      downloadBtn.addEventListener('click', async () => {
+        // If it's a data URL, download directly; else fetch as blob
+        try {
+          let blob;
+          if (src.startsWith('data:image')) {
+            const res = await fetch(src);
+            blob = await res.blob();
+          } else {
+            const res = await fetch(src, { mode: 'cors' });
+            blob = await res.blob();
+          }
           const a = document.createElement('a');
-          a.href = url;
-          a.download = 'attendance_all.csv';
-          document.body.appendChild(a);
+          a.href = URL.createObjectURL(blob);
+          a.download = `image-${Date.now()}.png`;
           a.click();
-          a.remove();
+          URL.revokeObjectURL(a.href);
+        } catch (e) {
+          alert('Direct download blocked. Right-click → Save Image As… or use proxy.');
+        }
+      });
 
-          URL.revokeObjectURL(url);
-      };
+      resizeBtn.addEventListener('click', async () => {
+        const targetW = Math.max(32, Math.min(4096, Number(resizeW.value)||512));
+        const targetH = Math.max(32, Math.min(4096, Number(resizeH.value)||512));
+        try {
+          const dataUrl = await resizeImageToDataURL(img, targetW, targetH);
+          // Swap preview to resized version
+          img.src = dataUrl;
+          wVal.textContent = targetW; hVal.textContent = targetH;
+        } catch (e) {
+          alert('Resize failed (likely CORS). Use Custom Proxy mode to enable editing.');
+        }
+      });
 
+      gallery.appendChild(node);
+    }
 
-    $('btnClearAll').onclick = ()=>{ if(confirm('All data will be removed. Continue?')){ localStorage.removeItem(STORAGE_KEY); location.reload(); } };
+    async function resizeImageToDataURL(imgEl, w, h) {
+      // Draw image into canvas (requires image to be CORS-accessible)
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      // Optional: high quality scaling
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(imgEl, 0, 0, w, h);
+      return canvas.toDataURL('image/png');
+    }
 
-    // ================= Auth flow ==================
-    $('btnAdminLogin').onclick = ()=>{
-      const pin = $('adminPin').value.trim(); if(pin===ADMIN_PIN){ $('authCard').style.display='none'; $('adminArea').style.display='block'; $('employeeArea').style.display='block'; renderDepts(); renderEmpTable(); renderSelectEmp(); } else { alert('PIN ખોટો'); } };
-    $('btnUseGuest').onclick = ()=>{ $('authCard').style.display='none'; $('adminArea').style.display='none'; $('employeeArea').style.display='block'; renderDepts(); renderEmpTable(); renderSelectEmp(); };
-    $('btnLogout').onclick = ()=>{ location.reload(); };
-
-    // When employee selection changes
-    $('selectEmp').onchange = ()=>{ renderTodayFor($('selectEmp').value); };
-
-    // initial
-    (function init(){ const s=load(); renderDepts(); renderEmpTable(); renderSelectEmp(); })();
-
+    // Initialize default preset
+    (function init() {
+      const [w, h] = presetSizeEl.value.split('x').map(Number);
+      widthEl.value = w; heightEl.value = h;
+    })();
   </script>
 </body>
 </html>
